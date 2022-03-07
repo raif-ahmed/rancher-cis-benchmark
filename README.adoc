@@ -1,4 +1,4 @@
-Asciidoc cheatsheet for GitHub
+Rancher CIS operator
 ==============================
 :toc:
 :toc-placement: preamble
