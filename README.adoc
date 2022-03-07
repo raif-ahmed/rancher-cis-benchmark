@@ -1,5 +1,7 @@
 = Rancher CIS operator
 
+:toc:
+
 .*Goals*
 
 . Understand hardening and CIS benchmarks in general
@@ -10,7 +12,7 @@
 .*References:*
 ** https://www.cisecurity.org/benchmark/kubernetes[CIS Kubernetes Benchmark]
 ** https://rancher.com/docs/rancher/v2.5/en/cis-scans/[Rancher Docs - CIS Scans]
-** https://github.com/rancher/cis-operator[Rancher Github - cis-operator]
+** https://github.com/rancher/cis-operator[Github - cis-operator]
 ** https://github.com/aquasecurity/kube-bench[kube-bench]
 ** https://github.com/vmware-tanzu/sonobuoy[sonobuoy]
 
@@ -49,7 +51,7 @@ You can use rancher to deploy Rancher CIS operator to any of the downstream clus
 
 In this post we will not use Rancher but rather deploy the rancher-cis-benchmark helm app directly.
 
-so lets inspect the rancher-cis-benchmark
+so lets inspect the rancher-cis-benchmark helm chart.
 
 . Add Rancher Helm repo
 +
