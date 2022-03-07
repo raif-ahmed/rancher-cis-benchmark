@@ -1,17 +1,27 @@
-= Rancher CIS operator
-
+Asciidoc cheatsheet for GitHub
+==============================
 :toc:
-:toc-placement!:
+:toc-placement: preamble
+:toclevels: 2
+:showtitle:
+:Some attr: Some value
 
+// Need some preamble to get TOC:
+{empty}
 
-.*Goals*
+toc::[]
+
+:sectnums:
+
+== Introduction
+=== Goals
 
 . Understand hardening and CIS benchmarks in general
 . Deploying and using Rancher CIS operator
 . Understand how Rancher CIS scan and hardening
 
 
-.*References:*
+=== References
 ** https://www.cisecurity.org/benchmark/kubernetes[CIS Kubernetes Benchmark]
 ** https://rancher.com/docs/rancher/v2.5/en/cis-scans/[Rancher Docs - CIS Scans]
 ** https://github.com/rancher/cis-operator[Github - cis-operator]
@@ -19,12 +29,8 @@
 ** https://github.com/vmware-tanzu/sonobuoy[sonobuoy]
 
 
-.*Background:*
+=== Background
 In this blog entry we cover deploying the Rancher CIS operator on RKE2 cluster, as well as other common tasks like do CIS scanning, getting CIS result and acting upon those results.
-
-:sectnums:
-
-toc::[]
 
 
 == What is Hardening and What is CIS Benchmark
