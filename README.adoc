@@ -1,6 +1,8 @@
 = Rancher CIS operator
 
 :toc:
+:toc-placement!:
+
 
 .*Goals*
 
@@ -21,6 +23,9 @@
 In this blog entry we cover deploying the Rancher CIS operator on RKE2 cluster, as well as other common tasks like do CIS scanning, getting CIS result and acting upon those results.
 
 :sectnums:
+
+toc::[]
+
 
 == What is Hardening and What is CIS Benchmark
 
