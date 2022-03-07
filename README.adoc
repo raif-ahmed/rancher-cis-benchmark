@@ -1,5 +1,4 @@
-Rancher CIS operator
-==============================
+= Rancher CIS operator
 :toc:
 :toc-placement: preamble
 :toclevels: 2
