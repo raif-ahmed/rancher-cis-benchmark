@@ -1,0 +1,233 @@
+= AMQ Online
+
+.*Goals*
+
+. Understand hardening and CIS benchmarks in general
+. Deploying and using Rancher CIS operator
+. Understand how Rancher CIS scan and hardening
+
+
+.*References:*
+** https://www.cisecurity.org/benchmark/kubernetes[CIS Kubernetes Benchmark]
+** https://rancher.com/docs/rancher/v2.5/en/cis-scans/[Rancher Docs - CIS Scans]
+** https://github.com/rancher/cis-operator[Rancher Github - cis-operator]
+** https://github.com/aquasecurity/kube-bench[kube-bench]
+** https://github.com/vmware-tanzu/sonobuoy[sonobuoy]
+
+
+.*Background:*
+In this blog entry we cover deploying the AMQ Online as well as other common tasks like Tenant namespace using GitOps, specifically in this case with ArgoCD. This blog post is going to assume some familiarity with AMQ Online and ArgoCD, and will concentrate on the more challenging aspects of using GitOps to deploy everything.
+
+:sectnums:
+
+== What is Hardening and What is CIS Benchmark
+
+*Hardening*, is the practice of reducing a system’s vulnerability exposure by reducing its attack surface. So when you perform system hardening you basically try to reduce the entry points where attackers can use.
+
+The Center for Internet Security (*CIS*) is a 501 nonprofit organization, formed in October, 2000. Its mission is to make the connected world a safer place by developing, validating, and promoting timely best practice solutions that help people, businesses, and governments protect themselves against pervasive cyber threats. Wikipedia
+
+*CIS Benchmark* is a set of recommendations for configuring Kubernetes to support a strong security posture. The Benchmark is tied to a specific Kubernetes release. https://www.cisecurity.org/benchmark/kubernetes[]
+
+So CIS Benchmarks is mainly focused on hardening two aspects,
+
+* K8s components hardening like API server, Etcd, kubelet, kube-proxy
+* Node hardening which normally follows your node selected Linux distribution, hardening guidelines
+** CIS Benchmarks (Some to mention)
+
+*** https://www.cisecurity.org/benchmark/suse_linux[SUSE Linux]
+*** https://www.cisecurity.org/benchmark/debian_linux[Debian Linux]
+*** https://www.cisecurity.org/benchmark/centos_linux[CentOS Linux]
+*** https://www.cisecurity.org/benchmark/red_hat_linux[Red Hat Enterprise Linux]
+
+
+== Deploying and using Rancher CIS operator
+Rancher can run a security scan to check whether Kubernetes is deployed according to security best practices as defined in the CIS Kubernetes Benchmark. The CIS scans can run on any Kubernetes cluster, including hosted Kubernetes providers such as EKS, AKS, and GKE.
+
+The rancher-cis-benchmark app leverages kube-bench, an open-source tool from Aqua Security, to check clusters for CIS Kubernetes Benchmark compliance. Also, to generate a cluster-wide report, the application utilizes Sonobuoy for report aggregation.
+
+You can use rancher to deploy Rancher CIS operator to any of the downstream clusters, for mor info. please see https://rancher.com/docs/rancher/v2.5/en/cis-scans/#installing-rancher-cis-benchmark[]
+
+In this post we will not use Rancher but rather deploy the rancher-cis-benchmark helm app directly.
+
+so lets inspect the rancher-cis-benchmark
+
+. Add Rancher Helm repo
++
+[source,bash]
+----
+$ helm repo add rancher https://charts.rancher.io
+"rancher" has been added to your repositories
+----
++
+[source,bash]
+----
+$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "rancher" chart repository
+Update Complete. ⎈Happy Helming!⎈
+----
+. Find the helm package name
++
+[source,bash]
+----
+$ helm search repo cis-benchmark
+NAME                                    CHART VERSION   APP VERSION     DESCRIPTION
+rancher/rancher-cis-benchmark           2.0.2           v2.0.2          The cis-operator enables running CIS benchmark ...
+rancher/rancher-cis-benchmark-crd       2.0.2                           Installs the CRDs for rancher-cis-benchmark.
+----
+. Now lets see the package information
++
+[source,bash]
+----
+$ helm show all rancher/rancher-cis-benchmark
+annotations:
+  catalog.cattle.io/auto-install: rancher-cis-benchmark-crd=match
+  catalog.cattle.io/certified: rancher
+  catalog.cattle.io/display-name: CIS Benchmark
+  catalog.cattle.io/kube-version: '>=1.16.0-0'
+  catalog.cattle.io/namespace: cis-operator-system
+  catalog.cattle.io/os: linux
+  catalog.cattle.io/provides-gvr: cis.cattle.io.clusterscans/v1
+  catalog.cattle.io/rancher-version: '>= 2.6.0-0'
+  catalog.cattle.io/release-name: rancher-cis-benchmark
+  catalog.cattle.io/type: cluster-tool
+  catalog.cattle.io/ui-component: rancher-cis-benchmark
+apiVersion: v1
+appVersion: v2.0.2
+description: The cis-operator enables running CIS benchmark security scans on a kubernetes
+  cluster
+icon: https://charts.rancher.io/assets/logos/cis-kube-bench.svg
+keywords:
+- security
+name: rancher-cis-benchmark
+version: 2.0.2
+
+---
+# Default values for rancher-cis-benchmark.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  cisoperator:
+    repository: rancher/cis-operator
+    tag: v1.0.6
+  securityScan:
+    repository: rancher/security-scan
+    tag: v0.2.5
+  sonobuoy:
+    repository: rancher/mirrored-sonobuoy-sonobuoy
+    tag: v0.53.2
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+global:
+  cattle:
+    systemDefaultRegistry: ""
+    clusterName: ""
+  kubectl:
+    repository: rancher/kubectl
+    tag: v1.20.2
+
+alerts:
+  enabled: false
+  severity: warning
+  metricsPort: 8080
+
+---
+# Rancher CIS Benchmark Chart
+
+The cis-operator enables running CIS benchmark security scans on a kubernetes cluster and generate compliance reports that can be downloaded.
+
+# Installation
+
+```
+helm install rancher-cis-benchmark ./ --create-namespace -n cis-operator-system
+```
+----
++
+[source,bash]
+----
+$ helm show all rancher/rancher-cis-benchmark-crd
+annotations:
+  catalog.cattle.io/certified: rancher
+  catalog.cattle.io/hidden: "true"
+  catalog.cattle.io/namespace: cis-operator-system
+  catalog.cattle.io/release-name: rancher-cis-benchmark-crd
+apiVersion: v1
+description: Installs the CRDs for rancher-cis-benchmark.
+name: rancher-cis-benchmark-crd
+type: application
+version: 2.0.2
+
+
+# rancher-cis-benchmark-crd
+A Rancher chart that installs the CRDs used by rancher-cis-benchmark.
+
+----
+. Deploy rancher-cis-benchmark (we will use the default values now)
++
+[source,bash]
+----
+$ helm install rancher-cis-benchmark-crd rancher/rancher-cis-benchmark-crd --create-namespace -n cis-operator-system
+NAME: rancher-cis-benchmark-crd
+LAST DEPLOYED: Mon Mar  7 15:18:16 2022
+NAMESPACE: cis-operator-system
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+----
++
+[source,bash]
+----
+$ helm install rancher-cis-benchmark rancher/rancher-cis-benchmark -n cis-operator-system
+NAME: rancher-cis-benchmark
+LAST DEPLOYED: Mon Mar  7 15:18:38 2022
+NAMESPACE: cis-operator-system
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+----
+. To make it easy for me i will craete a Kube context for the cis-operator-system namesapce
++
+[source,bash]
+----
+$ kubectl config set-context cis --cluster=default --namespace=cis-operator-system --user=default
+Context "cis" created.
+----
++
+[source,bash]
+----
+$ kubectl config use-context cis
+Switched to context "cis".
+----
++
+[source,bash]
+----
+$ kubectl get all
+NAME                                READY   STATUS    RESTARTS   AGE
+pod/cis-operator-649df6ff45-g9kgd   1/1     Running   0          7m57s
+
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/cis-operator   1/1     1            1           7m57s
+
+NAME                                      DESIRED   CURRENT   READY   AGE
+replicaset.apps/cis-operator-649df6ff45   1         1         1       7m57s
+----
+
+
