@@ -229,7 +229,8 @@ spec:
   targetNamespace: cis-operator-system
 ----
 +
-now apply .xref:rancher-cis-benchmark-chart.yaml[rancher-cis-benchmark-chart.yaml]
+and also apply
++
 [source,bash]
 ----
 $ kubectl apply -f rancher-cis-benchmark-chart.yaml
