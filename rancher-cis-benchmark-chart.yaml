@@ -1,0 +1,9 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: rancher-cis-benchmark
+  namespace: kube-system
+spec:
+  repo: https://charts.rancher.io
+  chart: rancher-cis-benchmark
+  targetNamespace: cis-operator-system
