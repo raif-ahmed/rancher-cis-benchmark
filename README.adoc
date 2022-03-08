@@ -188,29 +188,53 @@ version: 2.0.2
 A Rancher chart that installs the CRDs used by rancher-cis-benchmark.
 
 ----
-. Deploy rancher-cis-benchmark (we will use the default values now)
+. Deploy rancher-cis-benchmark (we will use the default values now), we will take advantage of https://docs.rke2.io/helm/[Helm Integration] in RKE2
++
+first the CRD
++
+.xref:rancher-cis-benchmark-crd-chart.yaml.yaml[rancher-cis-benchmark-crd-chart.yaml]
+[source,yaml]
+----
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: rancher-cis-benchmark-crd
+  namespace: kube-system
+spec:
+  repo: https://charts.rancher.io
+  chart: rancher-cis-benchmark-crd
+  targetNamespace: cis-operator-system
+----
++
+then apply 
 +
 [source,bash]
 ----
-$ helm install rancher-cis-benchmark-crd rancher/rancher-cis-benchmark-crd --create-namespace -n cis-operator-system
-NAME: rancher-cis-benchmark-crd
-LAST DEPLOYED: Mon Mar  7 15:18:16 2022
-NAMESPACE: cis-operator-system
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
+$ kubectl apply -f rancher-cis-benchmark-crd-chart.yaml
 ----
 +
+Now the controller
++
+.xref:rancher-cis-benchmark-chart.yaml.yaml[rancher-cis-benchmark-chart.yaml]
+[source,yaml]
+----
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: rancher-cis-benchmark
+  namespace: kube-system
+spec:
+  repo: https://charts.rancher.io
+  chart: rancher-cis-benchmark
+  targetNamespace: cis-operator-system
+----
++
+now apply .xref:rancher-cis-benchmark-chart.yaml[rancher-cis-benchmark-chart.yaml]
 [source,bash]
 ----
-$ helm install rancher-cis-benchmark rancher/rancher-cis-benchmark -n cis-operator-system
-NAME: rancher-cis-benchmark
-LAST DEPLOYED: Mon Mar  7 15:18:38 2022
-NAMESPACE: cis-operator-system
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
+$ kubectl apply -f rancher-cis-benchmark-chart.yaml
 ----
+
 . To make it easy for me i will create a Kube context for the cis-operator-system namesapce
 +
 [source,bash]
