@@ -310,7 +310,7 @@ for selecting the right Benchmark Versions, please refer to https://rancher.com/
 
 So lets create a scan by using the following clusterscan configuration
 
-xref:rke2-clusterscan.yaml[rke2-clusterscan.yaml]
+.xref:rke2-clusterscan.yaml[rke2-clusterscan.yaml]
 [source,yaml]
 ----
 apiVersion: cis.cattle.io/v1
