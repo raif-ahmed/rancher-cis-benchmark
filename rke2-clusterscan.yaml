@@ -3,4 +3,7 @@ kind: ClusterScan
 metadata:
   name: rke2-clusterscan
 spec:
-  scanProfileName: rke2-cis-1.6-permissive
+  scanProfileName: rke2-cis-1.6-profile-permissive
+  scheduledScanConfig:
+    cronSchedule: "*/2 * * * *" 
+    retentionCount: 3 

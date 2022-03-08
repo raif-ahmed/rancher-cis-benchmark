@@ -308,7 +308,37 @@ So, When a cluster scan runs, it points to a specific Scan Profile which points 
 
 for selecting the right Benchmark Versions, please refer to https://rancher.com/docs/rancher/v2.5/en/security/rancher-2.5/#rke-guides[Hardening Guides and Benchmark Versions]
 
-So lets create a scan by using the following clusterscan configuration
+So lets create a scan by using the following clusterscan configuration. 
+
+you can find all the attributes in CRD definition.
+[source,yaml]
+----
+$ kubectl explain clusterscan.spec
+KIND:     ClusterScan
+VERSION:  cis.cattle.io/v1
+
+RESOURCE: spec <Object>
+
+DESCRIPTION:
+     <empty>
+
+FIELDS:
+   scanProfileName      <>
+
+   scheduledScanConfig  <>
+
+   scoreWarning <>
+
+----
+Also if you are like me and likes to read the code you can check the CRD definition https://github.com/rancher/cis-operator/blob/v1.0.6/crds/clusterscan.yaml[]. Please note i'm matching the same version of the cisoperator image tag. It was part of the helm install values.
+
+[source,yaml]
+----
+  cisoperator:
+    repository: rancher/cis-operator
+    tag: v1.0.6
+----
+Anyway the following is our ClusterScan files
 
 .xref:rke2-clusterscan.yaml[rke2-clusterscan.yaml]
 [source,yaml]
@@ -318,10 +348,36 @@ kind: ClusterScan
 metadata:
   name: rke2-clusterscan
 spec:
-  scanProfileName: rke2-cis-1.6-permissive
+  scanProfileName: rke2-cis-1.6-profile-permissive <1>
+  scheduledScanConfig:
+    cronSchedule: "*/2 * * * *" <2>
+    retentionCount: 3 <3>
 ----
+<1> The ClusterScanProfiles we will refer to
+<2> A cron schedule to run the cluster scan every period of time
+<3> Retention count is the number of previous scans to retain
+
+now apply .xref:rke2-clusterscan.yaml[rke2-clusterscan.yaml]
 
 [source,bash]
 ----
 $ kubectl apply -f rke2-clusterscan.yaml
+----
+
+So you can see the result of the scan
+[source,bash]
+----
+$  kubectl get clusterscanreport
+NAME                                 LASTRUNTIMESTAMP                                             BENCHMARKVERSION
+scan-report-rke2-clusterscan-cm49z   2022-03-08 12:36:05.965841542 +0000 UTC m=+12637.239954292   rke2-cis-1.6-permissive
+scan-report-rke2-clusterscan-xhqdh   2022-03-08 12:32:06.151804518 +0000 UTC m=+12397.425917266   rke2-cis-1.6-permissive
+scan-report-rke2-clusterscan-xncsl   2022-03-08 12:34:05.924992056 +0000 UTC m=+12517.199104743   rke2-cis-1.6-permissive
+----
+Notice the LASTRUNTIMESTAMP which shows two consecutive runs because we scheduled every 2 minutes.
+
+Now the last step is to inspect the output report.
+
+[source,bash]
+----
+kubectl get clusterscanreport/scan-report-rke2-clusterscan-cm49z -o jsonpath="{.spec.reportJSON}" | jq '.results[] ' > report.json
 ----
