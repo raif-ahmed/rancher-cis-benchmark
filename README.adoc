@@ -43,13 +43,7 @@ The Center for Internet Security (*CIS*) is a 501 nonprofit organization, formed
 So CIS Benchmarks is mainly focused on hardening two aspects,
 
 * K8s components hardening like API server, Etcd, kubelet, kube-proxy
-* Node hardening which normally follows your node selected Linux distribution, hardening guidelines
-** CIS Benchmarks (Some to mention)
-
-*** https://www.cisecurity.org/benchmark/suse_linux[SUSE Linux]
-*** https://www.cisecurity.org/benchmark/debian_linux[Debian Linux]
-*** https://www.cisecurity.org/benchmark/centos_linux[CentOS Linux]
-*** https://www.cisecurity.org/benchmark/red_hat_linux[Red Hat Enterprise Linux]
+* Node hardening 
 
 
 == Deploying and using Rancher CIS operator
@@ -62,6 +56,8 @@ You can use rancher to deploy Rancher CIS operator to any of the downstream clus
 In this post we will not use Rancher but rather deploy the rancher-cis-benchmark helm app directly.
 
 so lets inspect the rancher-cis-benchmark helm chart.
+
+=== Deploying CIS operator
 
 . Add Rancher Helm repo
 +
@@ -87,7 +83,7 @@ NAME                                    CHART VERSION   APP VERSION     DESCRIPT
 rancher/rancher-cis-benchmark           2.0.2           v2.0.2          The cis-operator enables running CIS benchmark ...
 rancher/rancher-cis-benchmark-crd       2.0.2                           Installs the CRDs for rancher-cis-benchmark.
 ----
-. Now lets see the package information
+. Now lets see the package information, this is useful if you want to change the default values
 +
 [source,bash]
 ----
@@ -215,7 +211,7 @@ STATUS: deployed
 REVISION: 1
 TEST SUITE: None
 ----
-. To make it easy for me i will craete a Kube context for the cis-operator-system namesapce
+. To make it easy for me i will create a Kube context for the cis-operator-system namesapce
 +
 [source,bash]
 ----
@@ -241,5 +237,82 @@ deployment.apps/cis-operator   1/1     1            1           7m57s
 NAME                                      DESIRED   CURRENT   READY   AGE
 replicaset.apps/cis-operator-649df6ff45   1         1         1       7m57s
 ----
+== CIS Operator CRDs (types)
+
+=== CIS Benchmarks -- ClusterScanBenchmark
+So as mentioned before that each K8s version (and sometimes distribution) have a CIS benchmark, This is mapped in CIS operator to ClusterScanBenchmark. 
+
+A ClusterScanBenchmark is the wrapper of kube-bench. It defines the CIS BenchmarkVersion name and test configurations. The BenchmarkVersion name is a parameter provided to the kube-bench tool.
+
+By default, a few BenchmarkVersion names and test configurations are packaged as part of the CIS scan application.
+
+[source,bash]
+----
+$ kubectl get clusterscanbenchmarks
+NAME                      CLUSTERPROVIDER   MINKUBERNETESVERSION   MAXKUBERNETESVERSION   CUSTOMBENCHMARKCONFIGMAPNAME   CUSTOMBENCHMARKCONFIGMAPNAMESPACE
+cis-1.5                                     1.15.0
+cis-1.6                                     1.16.0
+eks-1.0                   eks               1.15.0
+gke-1.0                   gke               1.15.0
+k3s-cis-1.6-hardened      k3s               1.20.5
+k3s-cis-1.6-permissive    k3s               1.20.5
+rke-cis-1.5-hardened      rke               1.15.0
+rke-cis-1.5-permissive    rke               1.15.0
+rke-cis-1.6-hardened      rke               1.16.0
+rke-cis-1.6-permissive    rke               1.16.0
+rke2-cis-1.5-hardened     rke2              1.18.0
+rke2-cis-1.5-permissive   rke2              1.18.0
+rke2-cis-1.6-hardened     rke2              1.20.5
+rke2-cis-1.6-permissive   rke2              1.20.5
+----
+
+https://rancher.com/docs/rancher/v2.5/en/cis-scans/#test-profiles[]
+
+There are two types of scan benchmarks:
+
+*Permissive:* This profile has a set of tests that have been will be skipped as these tests will fail on a default RKE Kubernetes cluster. Besides the list of skipped tests, the profile will also not run the not applicable tests.
+*Hardened:* This profile will not skip any tests, except for the non-applicable tests.
+
+It is also possible to create a custom Benchmark Version using the rancher-cis-benchmark application, for more info. please see https://rancher.com/docs/rancher/v2.5/en/cis-scans/custom-benchmark/[]. This is useful when you have another industry standard or organization specif standard you want to compliy with, like HIPAA or others   
 
 
+=== Scan profiles -- ClusterScanProfiles
+A scan profile contains the configuration for the CIS scan, which includes the benchmark version to use and any specific tests to skip in that benchmark. So for the same ClusterScanBenchmark we can have multiple ClusterScanProfiles with . it is advisable for users to not edit the default ClusterScanProfiles
+
+[source,bash]
+----
+$ kubectl get clusterscanprofiles
+NAME                              BENCHMARKVERSION
+cis-1.5-profile                   cis-1.5
+cis-1.6-profile                   cis-1.6
+eks-profile                       eks-1.0
+gke-profile                       gke-1.0
+k3s-cis-1.6-profile-hardened      k3s-cis-1.6-hardened
+k3s-cis-1.6-profile-permissive    k3s-cis-1.6-permissive
+rke-profile-hardened-1.5          rke-cis-1.5-hardened
+rke-profile-hardened-1.6          rke-cis-1.6-hardened
+rke-profile-permissive-1.5        rke-cis-1.5-permissive
+rke-profile-permissive-1.6        rke-cis-1.6-permissive
+rke2-cis-1.5-profile-hardened     rke2-cis-1.5-hardened
+rke2-cis-1.5-profile-permissive   rke2-cis-1.5-permissive
+rke2-cis-1.6-profile-hardened     rke2-cis-1.6-hardened
+rke2-cis-1.6-profile-permissive   rke2-cis-1.6-permissive
+----
+
+=== Scans -- ClusterScan
+A scan is created to trigger a CIS scan on the cluster based on the defined profile. A report is created after the scan is completed.
+
+So, When a cluster scan runs, it points to a specific Scan Profile which points to a specific Benchmark Version. This is how things linked together.
+
+for selecting the right Benchmark Versions, please refer to https://rancher.com/docs/rancher/v2.5/en/security/rancher-2.5/#rke-guides[Hardening Guides and Benchmark Versions]
+
+xref:rke2-clusterscan.yaml[rke2-clusterscan.yaml]
+[source,yaml]
+----
+apiVersion: cis.cattle.io/v1
+kind: ClusterScan
+metadata:
+  name: rke2-clusterscan
+spec:
+  scanProfileName: rke2-cis-1.6-permissive
+----
