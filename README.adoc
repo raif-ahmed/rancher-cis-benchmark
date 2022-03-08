@@ -17,7 +17,7 @@ toc::[]
 
 . Understand hardening and CIS benchmarks in general
 . Deploying and using Rancher CIS operator
-. Understand how Rancher CIS scan and hardening
+. Perform a basic scan usecase
 
 
 === References
