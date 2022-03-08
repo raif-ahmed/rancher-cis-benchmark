@@ -375,7 +375,7 @@ scan-report-rke2-clusterscan-xncsl   2022-03-08 12:34:05.924992056 +0000 UTC m=+
 ----
 Notice the LASTRUNTIMESTAMP which shows two consecutive runs because we scheduled every 2 minutes.
 
-Now the last step is to inspect the output report.
+Now the last step is to get the output report for further inspection.
 
 [source,bash]
 ----
