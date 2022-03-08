@@ -272,6 +272,7 @@ https://rancher.com/docs/rancher/v2.5/en/cis-scans/#test-profiles[]
 There are two types of scan benchmarks:
 
 *Permissive:* This profile has a set of tests that have been will be skipped as these tests will fail on a default RKE Kubernetes cluster. Besides the list of skipped tests, the profile will also not run the not applicable tests.
+
 *Hardened:* This profile will not skip any tests, except for the non-applicable tests.
 
 It is also possible to create a custom Benchmark Version using the rancher-cis-benchmark application, for more info. please see https://rancher.com/docs/rancher/v2.5/en/cis-scans/custom-benchmark/[]. This is useful when you have another industry standard or organization specif standard you want to compliy with, like HIPAA or others   
