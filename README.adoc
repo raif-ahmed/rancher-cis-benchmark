@@ -237,9 +237,10 @@ deployment.apps/cis-operator   1/1     1            1           7m57s
 NAME                                      DESIRED   CURRENT   READY   AGE
 replicaset.apps/cis-operator-649df6ff45   1         1         1       7m57s
 ----
-== CIS Operator CRDs (types)
 
-=== CIS Benchmarks -- ClusterScanBenchmark
+=== CIS Operator CRDs (types)
+
+==== CIS Benchmarks -- ClusterScanBenchmark
 So as mentioned before that each K8s version (and sometimes distribution) have a CIS benchmark, This is mapped in CIS operator to ClusterScanBenchmark. 
 
 A ClusterScanBenchmark is the wrapper of kube-bench. It defines the CIS BenchmarkVersion name and test configurations. The BenchmarkVersion name is a parameter provided to the kube-bench tool.
@@ -276,7 +277,7 @@ There are two types of scan benchmarks:
 It is also possible to create a custom Benchmark Version using the rancher-cis-benchmark application, for more info. please see https://rancher.com/docs/rancher/v2.5/en/cis-scans/custom-benchmark/[]. This is useful when you have another industry standard or organization specif standard you want to compliy with, like HIPAA or others   
 
 
-=== Scan profiles -- ClusterScanProfiles
+==== Scan profiles -- ClusterScanProfiles
 A scan profile contains the configuration for the CIS scan, which includes the benchmark version to use and any specific tests to skip in that benchmark. So for the same ClusterScanBenchmark we can have multiple ClusterScanProfiles with . it is advisable for users to not edit the default ClusterScanProfiles
 
 [source,bash]
@@ -299,12 +300,14 @@ rke2-cis-1.6-profile-hardened     rke2-cis-1.6-hardened
 rke2-cis-1.6-profile-permissive   rke2-cis-1.6-permissive
 ----
 
-=== Scans -- ClusterScan
+==== Scans -- ClusterScan
 A scan is created to trigger a CIS scan on the cluster based on the defined profile. A report is created after the scan is completed.
 
 So, When a cluster scan runs, it points to a specific Scan Profile which points to a specific Benchmark Version. This is how things linked together.
 
 for selecting the right Benchmark Versions, please refer to https://rancher.com/docs/rancher/v2.5/en/security/rancher-2.5/#rke-guides[Hardening Guides and Benchmark Versions]
+
+So lets create a scan by using the following clusterscan configuration
 
 xref:rke2-clusterscan.yaml[rke2-clusterscan.yaml]
 [source,yaml]
@@ -315,4 +318,9 @@ metadata:
   name: rke2-clusterscan
 spec:
   scanProfileName: rke2-cis-1.6-permissive
+----
+
+[source,bash]
+----
+$ kubectl apply -f rke2-clusterscan.yaml
 ----
