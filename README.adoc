@@ -29,7 +29,7 @@ toc::[]
 
 
 === Background
-In this blog entry we cover deploying the Rancher CIS operator on RKE2 cluster, as well as other common tasks like do CIS scanning, getting CIS result and acting upon those results.
+In this blog entry we introduce a basic understanding about hardening and CIS benchmark profile, then we cover deploying the Rancher CIS operator on RKE2 cluster, as well as other common tasks like do CIS scanning, getting CIS result and acting upon those results.
 
 
 == What is Hardening and What is CIS Benchmark
