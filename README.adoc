@@ -391,7 +391,7 @@ $ kubectl apply -f rke2-clusterscan.yaml
 
 ==== Scan Reports -- ClusterScanReport
 
-So you can see the result of the scan, it contain the report as JSON result in the field .spec.reportJSON
+It is the object holding the result of the scan, it contain the report as JSON result in the field .spec.reportJSON
 
 [source,bash]
 ----
