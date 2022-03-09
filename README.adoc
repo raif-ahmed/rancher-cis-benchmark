@@ -300,7 +300,7 @@ There are two types of scan benchmarks:
 
 *Hardened:* This profile will not skip any tests, except for the non-applicable tests.
 
-It is also possible to create a custom Benchmark Version using the rancher-cis-benchmark application, for more info. please see https://rancher.com/docs/rancher/v2.5/en/cis-scans/custom-benchmark/[]. This is useful when you have another industry standard or organization specif standard you want to compliy with, like HIPAA or others   
+It is also possible to create a custom Benchmark Version using the rancher-cis-benchmark application, for more info. please see https://rancher.com/docs/rancher/v2.5/en/cis-scans/custom-benchmark/[]. This is useful when you have another industry standard or organization specific standard you want to comply with, like HIPAA or others   
 
 
 ==== Scan profiles -- ClusterScanProfiles
