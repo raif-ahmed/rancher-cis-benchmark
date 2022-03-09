@@ -389,7 +389,10 @@ now apply .xref:rke2-clusterscan.yaml[rke2-clusterscan.yaml]
 $ kubectl apply -f rke2-clusterscan.yaml
 ----
 
-So you can see the result of the scan
+==== Scan Reports -- ClusterScanReport
+
+So you can see the result of the scan, it contain the report as JSON result in the field .spec.reportJSON
+
 [source,bash]
 ----
 $  kubectl get clusterscanreport
