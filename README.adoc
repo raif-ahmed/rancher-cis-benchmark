@@ -236,7 +236,7 @@ and also apply
 $ kubectl apply -f rancher-cis-benchmark-chart.yaml
 ----
 
-. To make it easy for me i will create a Kube context for the cis-operator-system namesapce
+. To make it easy for me i will create a Kube context for the cis-operator-system namespace
 +
 [source,bash]
 ----
