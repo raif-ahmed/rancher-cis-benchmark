@@ -192,7 +192,7 @@ A Rancher chart that installs the CRDs used by rancher-cis-benchmark.
 +
 first the CRD
 +
-.xref:rancher-cis-benchmark-crd-chart.yaml.yaml[rancher-cis-benchmark-crd-chart.yaml]
+.xref:rancher-cis-benchmark-crd-chart.yaml[rancher-cis-benchmark-crd-chart.yaml]
 [source,yaml]
 ----
 apiVersion: helm.cattle.io/v1
@@ -215,7 +215,7 @@ $ kubectl apply -f rancher-cis-benchmark-crd-chart.yaml
 +
 Now the controller
 +
-.xref:rancher-cis-benchmark-chart.yaml.yaml[rancher-cis-benchmark-chart.yaml]
+.xref:rancher-cis-benchmark-chart.yaml[rancher-cis-benchmark-chart.yaml]
 [source,yaml]
 ----
 apiVersion: helm.cattle.io/v1
